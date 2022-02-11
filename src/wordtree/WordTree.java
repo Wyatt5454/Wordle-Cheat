@@ -7,5 +7,11 @@ package wordtree;
  *
  */
 public class WordTree {
-
+	
+	private TreeNode root = new TreeNode();
+	
+	public WordTree(String filename) {
+		
+		
+	}
 }
