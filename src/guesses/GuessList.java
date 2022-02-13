@@ -35,6 +35,68 @@ public class GuessList {
 		}
 		
 		return false;
+	}
+	
+	public boolean containsLetterAtPosition(char letter, int position) {
+		for (LetterGuess guess : letters) {
+			if (guess.getLetter() == letter && guess.getPosition() == position) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Used to get the positions where guesses have taken place.
+	 * @param position
+	 * @return
+	 */
+	public ArrayList<LetterGuess> getLettersAtPosition(int position) {
+		ArrayList<LetterGuess> lettersAtPosition = new ArrayList<LetterGuess>();
+		
+		for (LetterGuess guess : letters ) {
+			if (guess.getPosition() == position) {
+				lettersAtPosition.add(guess);
+			}
+		}
+		
+		return lettersAtPosition;
+	}
+	
+	/**
+	 * Used to get the list of letters that are yellow, and 
+	 * have not been guessed in a certain position.
+	 * @param position
+	 * @return
+	 */
+	public ArrayList<LetterGuess> getLettersNotAtPosition(int position) {
+		ArrayList<LetterGuess> lettersNotAtPosition = new ArrayList<LetterGuess>();
+		
+		for (LetterGuess guess : letters ) {
+			if (guess.getPosition() != position) {
+				lettersNotAtPosition.add(guess);
+			}
+		}
+		
+		ArrayList<LetterGuess> removeList = new ArrayList<LetterGuess>();
+		
+		// This loop removes a letter if it has been guessed
+		// in the current position.
+		for (LetterGuess guess : lettersNotAtPosition ) {
+			for (LetterGuess guessCheck : letters ) {
+				if (guess.getLetter() == guessCheck.getLetter()) {
+					if (guessCheck.getPosition() == position) {
+						removeList.add(guess);
+					}
+				}
+			}
+		}
+		
+		lettersNotAtPosition.removeAll(removeList);
+		
+		
+		return lettersNotAtPosition;
 		
 	}
 

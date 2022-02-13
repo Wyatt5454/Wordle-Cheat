@@ -1,6 +1,7 @@
 package driver;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import guesses.LetterGuess;
@@ -46,7 +47,19 @@ public class WordleCheat {
 			System.out.print("WordTree altered.  Contains " + tree.getBranchCount() + " branches.");
 			
 			
-			System.out.print("\nPossible answers:\n\n");
+			System.out.print("\n\nPossible answers:\n\n");
+			
+			tree.wipeGuesses();
+			ArrayList<String> possibleAnswers = tree.getPossibleWords();
+			
+			StringBuilder builder = new StringBuilder();
+			
+			for (String answer : possibleAnswers ) {
+				builder.append(answer);
+				builder.append('\t');
+			}
+			
+			System.out.println(builder.toString());
 			
 			
 			

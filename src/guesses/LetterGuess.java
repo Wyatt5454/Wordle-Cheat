@@ -27,6 +27,10 @@ public class LetterGuess {
 		return letter;
 	}
 	
+	public String getLetterAsString() {
+		return "" + letter;
+	}
+	
 	public int getPosition() {
 		return position;
 	}

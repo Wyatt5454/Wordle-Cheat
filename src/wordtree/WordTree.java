@@ -68,7 +68,8 @@ public class WordTree {
 	}
 	
 	public ArrayList<String> getPossibleWords() {
-		return root.getPossibleWords(greenLetters, yellowLetters);
+		root.checkTreeForWords(greenLetters, yellowLetters, "");
+		return TreeNode.getPossibleWords();
 		
 	}
 
@@ -80,11 +81,16 @@ public class WordTree {
 	 */
 	private void pruneTree() {
 		root.resetBranchCount();
-		root.pruneTree(blackLetters);
+		root.pruneTree(blackLetters, yellowLetters);
 		blackLetters = new GuessList();
 	}
 	
 	public int getBranchCount() {
 		return TreeNode.getBranchCount();
+	}
+
+	public void wipeGuesses() {
+		root.wipeGuesses();
+		
 	}
 }

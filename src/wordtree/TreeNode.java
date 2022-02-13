@@ -6,6 +6,7 @@ package wordtree;
 import java.util.ArrayList;
 
 import guesses.GuessList;
+import guesses.LetterGuess;
 
 /**
  * Holds a letter which represents a branch traversal, and the 
@@ -18,19 +19,21 @@ public class TreeNode {
 	
 	private char letter;
 	private ArrayList<TreeNode> nodes = new ArrayList<>();
+	private int position = 0;
+	
 	private static int branchCount = 0;
 	private static ArrayList<String> possibleWords = new ArrayList<>();
 	
 	private boolean isRoot = false;
-	private boolean isLeaf = false;
 	
 	public TreeNode() {
 		this.isRoot = true;
+		position = -1;
 	}
 	
-	public TreeNode(char letter, boolean isLeaf) {
+	public TreeNode(char letter, int position) {
 		this.setLetter(letter);
-		this.isLeaf = isLeaf;
+		this.position = position;
 		branchCount = getBranchCount() + 1;
 	}
 	
@@ -61,7 +64,7 @@ public class TreeNode {
 		}
 		
 		// Here we know the next letter needs a new TreeNode
-		TreeNode nextNode = new TreeNode(nextLetter, false);
+		TreeNode nextNode = new TreeNode(nextLetter, position);
 		nodes.add(nextNode);
 		nextNode.buildExtendedTreeNodes(word, ++position);
 		
@@ -78,7 +81,7 @@ public class TreeNode {
 	 * 
 	 * @param blackLetters
 	 */
-	public void pruneTree(GuessList blackLetters) {
+	public void pruneTree(GuessList blackLetters, GuessList yellowLetters) {
 		
 		ArrayList<TreeNode> nodesToRemove = new ArrayList<>();
 		
@@ -87,18 +90,72 @@ public class TreeNode {
 			if (blackLetters.containsLetter(node.getLetter())) {
 				nodesToRemove.add(node);
 			}
+			else if (yellowLetters.containsLetterAtPosition(node.getLetter(), node.getPosition())) {
+				nodesToRemove.add(node);
+			}
 			else {
 				branchCount++;
-				node.pruneTree(blackLetters);
+				node.pruneTree(blackLetters, yellowLetters);
 			}
 		}
 		
 		nodes.removeAll(nodesToRemove);
 	}
 	
-	public ArrayList<String> getPossibleWords(GuessList greenLetters, GuessList yellowLetters) {
+	public void checkTreeForWords(GuessList greenLetters, GuessList yellowLetters, String currentTraversal) {
 		
-		return null;
+		// We know we are at the bottom of the tree.
+		if (position == 4) {
+			assessGuess(currentTraversal, yellowLetters);
+			return;
+		}
+		
+		// First check if we have a green letter here.
+		ArrayList<LetterGuess> nextPosition = greenLetters.getLettersAtPosition(this.position + 1);
+		
+		// Always traverse a green node if possible
+		if (!nextPosition.isEmpty()) {
+			//Check if it is possible to traverse to the green letter
+			for (TreeNode node : nodes) {
+				if (nextPosition.get(0).getLetter() == node.getLetter()) {
+					StringBuilder nextTraversal = new StringBuilder(currentTraversal);
+					nextTraversal.append(nextPosition.get(0).getLetter());
+					node.checkTreeForWords(greenLetters, yellowLetters, nextTraversal.toString());
+					return;
+				}
+			}			
+		}
+		// Try everything that hasn't been tried.
+		else {
+			for (TreeNode node : nodes ) {
+				StringBuilder nextTraversal = new StringBuilder(currentTraversal);
+				nextTraversal.append(node.getLetter());
+				node.checkTreeForWords(greenLetters, yellowLetters, nextTraversal.toString());
+			}
+		}
+		
+		return;
+	}
+
+	/**
+	 * Check to see if our guess contains each of the yellow letters.
+	 * If it does, this is a legitimate guess.
+	 * 
+	 * @param currentTraversal
+	 * @param yellowLetters
+	 */
+	private void assessGuess(String guess, GuessList yellowLetters) {
+		
+		for (LetterGuess letter : yellowLetters.getLetters() ) {
+			if (!guess.contains(new StringBuilder(letter.getLetterAsString()))) {
+				
+				// Here our guess does not contain a yellow letter.  Reject it.
+				return;
+			}
+		}
+		
+		possibleWords.add(guess);
+		
 	}
 
 	public char getLetter() {
@@ -121,8 +178,8 @@ public class TreeNode {
 		return isRoot;
 	}
 
-	public boolean isLeaf() {
-		return isLeaf;
+	public int getPosition() {
+		return position;
 	}
 
 	public static int getBranchCount() {
@@ -131,6 +188,14 @@ public class TreeNode {
 	
 	public void resetBranchCount() {
 		branchCount = 0;
+	}
+
+	public static ArrayList<String> getPossibleWords() {
+		return possibleWords;
+	}
+
+	public void wipeGuesses() {
+		possibleWords.clear();
 	}
 
 	
