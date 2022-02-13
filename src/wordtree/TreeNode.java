@@ -28,6 +28,41 @@ public class TreeNode {
 		this.setLetter(letter);
 		this.isLeaf = isLeaf;
 	}
+	
+	/**
+	 * Used to build additional TreeNodes if they are
+	 * necessary to build.  Calls itself until we've 
+	 * built the TreeNode for the 5th letter.
+	 * @param word
+	 * @param position
+	 */
+	public void buildExtendedTreeNodes(String word, int position) {
+		
+		// Quit the loop when we get to the 5th letter
+		if (position > 4) {
+			return;
+		}
+		
+		// Check the next letter we need to make a node for
+		char nextLetter = word.charAt(position);
+		
+		// Check to see if the letter already exists here.
+		for ( TreeNode node : nodes ) {
+			// No need to build a TreeNode if one already exists
+			if (nextLetter == node.getLetter() ) {
+				node.buildExtendedTreeNodes(word, ++position);
+				return;
+			}
+		}
+		
+		// Here we know the next letter needs a new TreeNode
+		TreeNode nextNode = new TreeNode(nextLetter, false);
+		nodes.add(nextNode);
+		nextNode.buildExtendedTreeNodes(word, ++position);
+		
+		
+		return;
+	}
 
 	public char getLetter() {
 		return letter;
