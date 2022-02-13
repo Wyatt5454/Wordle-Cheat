@@ -13,17 +13,8 @@ public class WordGuess {
 			this.letters.add(letter);
 		}
 	}
-	
-	public ArrayList<LetterGuess> getCorrectLetters() {
-		
-		ArrayList<LetterGuess> correctLetters = new ArrayList<>();
-		
-		for (LetterGuess letter : letters) {
-			if (letter.isPresent()) {
-				correctLetters.add(letter);
-			}
-		}
-		
-		return correctLetters;
+
+	public ArrayList<LetterGuess> getLetters() {
+		return this.letters;
 	}
 }
