@@ -5,6 +5,8 @@ package wordtree;
 
 import java.util.ArrayList;
 
+import guesses.GuessList;
+
 /**
  * Holds a letter which represents a branch traversal, and the 
  * list of nodes.
@@ -16,6 +18,8 @@ public class TreeNode {
 	
 	private char letter;
 	private ArrayList<TreeNode> nodes = new ArrayList<>();
+	private static int branchCount = 0;
+	private static ArrayList<String> possibleWords = new ArrayList<>();
 	
 	private boolean isRoot = false;
 	private boolean isLeaf = false;
@@ -27,6 +31,7 @@ public class TreeNode {
 	public TreeNode(char letter, boolean isLeaf) {
 		this.setLetter(letter);
 		this.isLeaf = isLeaf;
+		branchCount = getBranchCount() + 1;
 	}
 	
 	/**
@@ -63,6 +68,38 @@ public class TreeNode {
 		
 		return;
 	}
+	
+	/**
+	 * Do a full tree traversal, removing dead branches
+	 * as we go.
+	 * 
+	 * Reset the total branch count and recount it as
+	 * we traverse.
+	 * 
+	 * @param blackLetters
+	 */
+	public void pruneTree(GuessList blackLetters) {
+		
+		ArrayList<TreeNode> nodesToRemove = new ArrayList<>();
+		
+		for (TreeNode node : nodes ) {
+			
+			if (blackLetters.containsLetter(node.getLetter())) {
+				nodesToRemove.add(node);
+			}
+			else {
+				branchCount++;
+				node.pruneTree(blackLetters);
+			}
+		}
+		
+		nodes.removeAll(nodesToRemove);
+	}
+	
+	public ArrayList<String> getPossibleWords(GuessList greenLetters, GuessList yellowLetters) {
+		
+		return null;
+	}
 
 	public char getLetter() {
 		return letter;
@@ -87,4 +124,15 @@ public class TreeNode {
 	public boolean isLeaf() {
 		return isLeaf;
 	}
+
+	public static int getBranchCount() {
+		return branchCount;
+	}
+	
+	public void resetBranchCount() {
+		branchCount = 0;
+	}
+
+	
+
 }

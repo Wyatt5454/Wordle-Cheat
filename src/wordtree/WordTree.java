@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import guesses.LetterGuess;
-import guesses.WordGuess;
+import guesses.GuessList;
 
 /**
  * 
@@ -17,9 +17,9 @@ public class WordTree {
 	
 	private TreeNode root = new TreeNode();
 	
-	private ArrayList<LetterGuess> yellowLetters = new ArrayList<>();
-	private ArrayList<LetterGuess> greenLetters = new ArrayList<>();
-	private ArrayList<LetterGuess> blackLetters = new ArrayList<>();
+	private GuessList yellowLetters = new GuessList();
+	private GuessList greenLetters = new GuessList();
+	private GuessList blackLetters = new GuessList();
 	
 	
 	public WordTree(String filename) throws FileNotFoundException {
@@ -46,41 +46,45 @@ public class WordTree {
 		myReader.close();
 	}
 	
-	public void addGuess(WordGuess guess) {
-		ArrayList<LetterGuess> letters = guess.getLetters();
+	public void addGuess(GuessList guess) {
 		
-		for (LetterGuess letter : letters ) {
+		for (LetterGuess letter : guess.getLetters() ) {
 			// Here we have a perfect letter guess.
 			if (letter.isPresent() && letter.isCorrectPosition()) {
 				
-				if (!greenLetters.contains(letter)) {
-					greenLetters.add(letter);
-				}
+				greenLetters.addLetterGuess(letter);
 			}
 			else if (letter.isPresent() && !letter.isCorrectPosition()) {
 				
-				//TODO: Change so that yellow letter guesses position's are recorded.
-				if (!yellowLetters.contains(letter)) {
-					yellowLetters.add(letter);
-				}
-				
+				yellowLetters.addLetterGuess(letter);
 			}
 			else {
-				if (!blackLetters.contains(letter)) {
-					blackLetters.add(letter);
-				}
+				
+				blackLetters.addLetterGuess(letter);
 			}
 		}
 		
 		pruneTree();
 	}
+	
+	public ArrayList<String> getPossibleWords() {
+		return root.getPossibleWords(greenLetters, yellowLetters);
+		
+	}
 
 	/**
 	 * This method needs to take the last guesses black letters
 	 * and do a full tree traversal, pruning branches as it goes.
+	 * 
+	 * Wipe the list afterwards.  No use for them after pruning.
 	 */
 	private void pruneTree() {
-		// TODO make it dummy.
-		
+		root.resetBranchCount();
+		root.pruneTree(blackLetters);
+		blackLetters = new GuessList();
+	}
+	
+	public int getBranchCount() {
+		return TreeNode.getBranchCount();
 	}
 }
